@@ -143,4 +143,15 @@ describe ('Nodes....', () => {
         expect(c.countHopsTo(b)).toBe(3);
         expect(d.countHopsTo(a)).toBe(3);
     });
+
+    test('Count hops with multiple routes indicates shortest route', () => {
+        const c = new Node();
+        const d = new Node();
+        const e = new Node();
+        c.linkTo(d);
+        d.linkTo(e);
+        c.linkTo(e);
+
+        expect(c.countMinimumHopsTo(e)).toBe(1);
+    });
 })
