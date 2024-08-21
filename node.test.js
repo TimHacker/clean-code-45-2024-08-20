@@ -143,7 +143,9 @@ describe ('Nodes....', () => {
 
         expect(c.countHopsTo(e)).toBe(1);
     });
+});
 
+describe("Cost....", () => {
     test('connection with itself costs nothing', () => {
         const c = new Node();
 
@@ -165,5 +167,38 @@ describe ('Nodes....', () => {
         const c = new Node();
 
         expect(() => b.minimumCostTo(c)).toThrowError('Unreachable node');
+    });
+
+    test('calculate cost for two hops', () => {
+        const c = new Node();
+        const d = new Node();
+        const e = new Node();
+
+        c.linkTo(d, 1);
+        d.linkTo(e, 2);
+
+        expect(c.minimumCostTo(e)).toBe(3);
+    });
+
+    test('calculate cost when two routes', () => {
+        const c = new Node();
+        const d = new Node();
+        const e = new Node();
+
+        c.linkTo(e, 8);
+        c.linkTo(d, 1);
+        d.linkTo(e, 2);
+
+        expect(c.minimumCostTo(e)).toBe(3);
+    });
+
+    test('calculate cost with parallel routes', () => {
+        const c = new Node();
+        const d = new Node();
+
+        c.linkTo(d, 7);
+        c.linkTo(d, 1);
+
+        expect(c.minimumCostTo(d)).toBe(1);
     });
 })

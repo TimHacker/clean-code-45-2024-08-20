@@ -1,3 +1,5 @@
+const {Link} = require("./link");
+
 class Node {
     constructor(){
         this._neighbours = []
@@ -7,22 +9,22 @@ class Node {
 
     canReach(other){
         const visitedNodes = [];
-        return this.#evaluateJourneyRecursive(other, visitedNodes, this.#countStrategy) !== Node.UNREACHABLE;
+        return this.#costJourneyRecursive(other, visitedNodes, this.#countStrategy) !== Node.UNREACHABLE;
     }
 
     linkTo(destinationNode, cost = 1){
-        this._neighbours.push({ destinationNode, cost });
+        this._neighbours.push(new Link(destinationNode, cost));
     }
 
     countHopsTo(other) {
-        const hopCount = this.#evaluateJourneyRecursive(other, [], this.#countStrategy());
+        const hopCount = this.#costJourneyRecursive(other, [], this.#countStrategy);
         if (hopCount === Node.UNREACHABLE) {
             throw new Error('Unreachable node');
         }
         return hopCount;
     }
 
-    #evaluateJourneyRecursive(other, visitedNodes, countStrategy) {
+    #costJourneyRecursive(other, visitedNodes, countStrategy) {
         if (other === this) {
             return 0;
         }
@@ -35,10 +37,11 @@ class Node {
 
         for (let i = 0; i < this._neighbours.length; i++) {
             const neighbour = this._neighbours[i];
-            const hopsFromNeighbour = neighbour.destinationNode.#evaluateJourneyRecursive(other, visitedNodes, countStrategy);
+            //fixme
+            const hopsFromNeighbour = neighbour.getNode().#costJourneyRecursive(other, visitedNodes, countStrategy);
 
             if (hopsFromNeighbour !== Node.UNREACHABLE) {
-                const route = countStrategy(neighbour) + hopsFromNeighbour;
+                const route = countStrategy(neighbour, hopsFromNeighbour);
 
                 if (shortestHops === Node.UNREACHABLE || route < shortestHops) {
                     shortestHops = route;
@@ -50,20 +53,19 @@ class Node {
     }
 
     minimumCostTo(destination) {
-
-        const cost =  this.#evaluateJourneyRecursive(destination, [], this.#costStrategy);
+        const cost =  this.#costJourneyRecursive(destination, [], this.#costStrategy);
         if (cost === Node.UNREACHABLE) {
             throw new Error('Unreachable node');
         }
         return cost;
     }
 
-    #countStrategy() {
-        return () => 1;
+    #countStrategy(link, runningTotal) {
+        return link.addHop(runningTotal);
     }
 
-    #costStrategy(destination) {
-        return destination.cost;
+    #costStrategy(link, runningTotal) {
+        return link.addCost(runningTotal);
     }
 }
 
