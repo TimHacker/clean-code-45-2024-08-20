@@ -143,4 +143,21 @@ describe ('Nodes....', () => {
 
         expect(c.countHopsTo(e)).toBe(1);
     });
+
+    test('connection with itself costs nothing', () => {
+        const c = new Node();
+
+        expect(c.minimumCostTo(c)).toBe(0);
+    });
+
+    test('minimum cost to direct neighbour', () => {
+        const c = new Node();
+        const d = new Node();
+
+        c.linkTo(d, 7);
+
+        expect(c.minimumCostTo(d)).toBe(7);
+    });
+
+    // add in unreachable test for minimumCostTo
 })

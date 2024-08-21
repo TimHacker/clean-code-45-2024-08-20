@@ -7,22 +7,22 @@ class Node {
 
     canReach(other){
         const visitedNodes = [];
-        return this._countHopsToRecursive(other, visitedNodes) !== Node.UNREACHABLE;
+        return this._countHopsToRecursive(other, visitedNodes, () => 1) !== Node.UNREACHABLE;
     }
 
-    linkTo(other){
-        this._neighbours.push(other);
+    linkTo(destinationNode, cost = 1){
+        this._neighbours.push({ destinationNode, cost });
     }
 
     countHopsTo(other) {
-        const hopCount = this._countHopsToRecursive(other, []);
+        const hopCount = this._countHopsToRecursive(other, [], () => 1);
         if (hopCount === Node.UNREACHABLE) {
             throw new Error('Unreachable node');
         }
         return hopCount;
     }
 
-    _countHopsToRecursive(other, visitedNodes) {
+    _countHopsToRecursive(other, visitedNodes, countStrategy) {
         if (other === this) {
             return 0;
         }
@@ -35,10 +35,10 @@ class Node {
 
         for (let i = 0; i < this._neighbours.length; i++) {
             const neighbour = this._neighbours[i];
-            const hopsFromNeighbour = neighbour._countHopsToRecursive(other, visitedNodes);
+            const hopsFromNeighbour = neighbour.destinationNode._countHopsToRecursive(other, visitedNodes, countStrategy);
 
             if (hopsFromNeighbour !== Node.UNREACHABLE) {
-                const route = 1 + hopsFromNeighbour;
+                const route = countStrategy(neighbour) + hopsFromNeighbour;
 
                 if (shortestHops === Node.UNREACHABLE || route < shortestHops) {
                     shortestHops = route;
@@ -49,6 +49,13 @@ class Node {
         return shortestHops;
     }
 
+    minimumCostTo(destination) {
+        const useCost = (destination) => {
+            return destination.cost;
+        }
+
+        return this._countHopsToRecursive(destination, [], useCost);
+    }
 }
 
 module.exports = {Node}
