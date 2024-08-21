@@ -7,24 +7,7 @@ class Node {
 
     canReach(other){
         const visitedNodes = [];
-        return this._canReach(other, visitedNodes);
-    }
-
-    _canReach(other, visitedNodes){
-        if (other === this){
-            return true;
-        }
-        if (visitedNodes.includes(this)){
-            return false;
-        }
-        visitedNodes.push(this);
-        for (let i = 0; i < this._neighbours.length; i++){
-            const neighbour = this._neighbours[i];
-            if (neighbour._canReach(other, visitedNodes)){
-                return true;
-            }
-        }
-        return false;
+        return this._countHopsToRecursive(other, visitedNodes) !== Node.UNREACHABLE;
     }
 
     linkTo(other){
@@ -43,13 +26,10 @@ class Node {
         if (other === this) {
             return 0;
         }
-
         if (visitedNodes.includes(this)) {
             return Node.UNREACHABLE;
         }
-
         visitedNodes.push(this);
-
         for (let i = 0; i < this._neighbours.length; i++) {
             const neighbour = this._neighbours[i];
             const hopsFromNeighbour = neighbour._countHopsToRecursive(other, visitedNodes);
@@ -58,7 +38,6 @@ class Node {
                 return 1 + hopsFromNeighbour;
             }
         }
-
         return Node.UNREACHABLE;
     }
 }
