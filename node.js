@@ -7,7 +7,7 @@ class Node {
 
     canReach(other){
         const visitedNodes = [];
-        return this._countHopsToRecursive(other, visitedNodes, () => 1) !== Node.UNREACHABLE;
+        return this.#evaluateJourneyRecursive(other, visitedNodes, this.#countStrategy) !== Node.UNREACHABLE;
     }
 
     linkTo(destinationNode, cost = 1){
@@ -15,14 +15,14 @@ class Node {
     }
 
     countHopsTo(other) {
-        const hopCount = this._countHopsToRecursive(other, [], () => 1);
+        const hopCount = this.#evaluateJourneyRecursive(other, [], this.#countStrategy());
         if (hopCount === Node.UNREACHABLE) {
             throw new Error('Unreachable node');
         }
         return hopCount;
     }
 
-    _countHopsToRecursive(other, visitedNodes, countStrategy) {
+    #evaluateJourneyRecursive(other, visitedNodes, countStrategy) {
         if (other === this) {
             return 0;
         }
@@ -35,7 +35,7 @@ class Node {
 
         for (let i = 0; i < this._neighbours.length; i++) {
             const neighbour = this._neighbours[i];
-            const hopsFromNeighbour = neighbour.destinationNode._countHopsToRecursive(other, visitedNodes, countStrategy);
+            const hopsFromNeighbour = neighbour.destinationNode.#evaluateJourneyRecursive(other, visitedNodes, countStrategy);
 
             if (hopsFromNeighbour !== Node.UNREACHABLE) {
                 const route = countStrategy(neighbour) + hopsFromNeighbour;
@@ -50,15 +50,20 @@ class Node {
     }
 
     minimumCostTo(destination) {
-        const useCost = (destination) => {
-            return destination.cost;
-        }
 
-        const cost =  this._countHopsToRecursive(destination, [], useCost);
+        const cost =  this.#evaluateJourneyRecursive(destination, [], this.#costStrategy);
         if (cost === Node.UNREACHABLE) {
             throw new Error('Unreachable node');
         }
         return cost;
+    }
+
+    #countStrategy() {
+        return () => 1;
+    }
+
+    #costStrategy(destination) {
+        return destination.cost;
     }
 }
 
