@@ -1,24 +1,26 @@
-class Node{
+class Node {
     constructor(){
-        this._children = []
+        this._neighbours = []
     }
 
+    static UNREACHABLE = -1;
+
     canReach(other){
-        var visitedNodes = [];
+        const visitedNodes = [];
         return this._canReach(other, visitedNodes);
     }
 
     _canReach(other, visitedNodes){
-        if (other == this){
+        if (other === this){
             return true;
         }
         if (visitedNodes.includes(this)){
             return false;
         }
         visitedNodes.push(this);
-        for (var i = 0; i < this._children.length; i++){
-            var child = this._children[i];
-            if (child._canReach(other, visitedNodes)){
+        for (let i = 0; i < this._neighbours.length; i++){
+            const neighbour = this._neighbours[i];
+            if (neighbour._canReach(other, visitedNodes)){
                 return true;
             }
         }
@@ -26,7 +28,38 @@ class Node{
     }
 
     linkTo(other){
-        this._children.push(other);
+        this._neighbours.push(other);
+    }
+
+    countHopsTo(other) {
+        const hopCount = this._countHopsToRecursive(other, []);
+        if (hopCount === Node.UNREACHABLE) {
+            throw new Error('Unreachable node');
+        }
+        return hopCount;
+    }
+
+    _countHopsToRecursive(other, visitedNodes) {
+        if (other === this) {
+            return 0;
+        }
+
+        if (visitedNodes.includes(this)) {
+            return Node.UNREACHABLE;
+        }
+
+        visitedNodes.push(this);
+
+        for (let i = 0; i < this._neighbours.length; i++) {
+            const neighbour = this._neighbours[i];
+            const hopsFromNeighbour = neighbour._countHopsToRecursive(other, visitedNodes);
+
+            if (hopsFromNeighbour !== Node.UNREACHABLE) {
+                return 1 + hopsFromNeighbour;
+            }
+        }
+
+        return Node.UNREACHABLE;
     }
 }
 
