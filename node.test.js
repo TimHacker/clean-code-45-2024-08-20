@@ -160,4 +160,10 @@ describe ('Nodes....', () => {
     });
 
     // add in unreachable test for minimumCostTo
+    test('cannot calculate costs for unreachable node', () => {
+        const b = new Node();
+        const c = new Node();
+
+        expect(() => b.minimumCostTo(c)).toThrowError('Unreachable node');
+    });
 })

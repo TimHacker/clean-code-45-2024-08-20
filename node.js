@@ -54,7 +54,11 @@ class Node {
             return destination.cost;
         }
 
-        return this._countHopsToRecursive(destination, [], useCost);
+        const cost =  this._countHopsToRecursive(destination, [], useCost);
+        if (cost === Node.UNREACHABLE) {
+            throw new Error('Unreachable node');
+        }
+        return cost;
     }
 }
 
