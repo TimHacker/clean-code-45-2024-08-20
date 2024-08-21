@@ -3,7 +3,7 @@ class Node {
         this._neighbours = []
     }
 
-    static UNREACHABLE = -1;
+    static UNREACHABLE = Number.MAX_VALUE;
 
     canReach(other){
         const visitedNodes = [];
@@ -31,7 +31,7 @@ class Node {
         }
         visitedNodes.push(this);
 
-        let shortestHops = Number.MAX_SAFE_INTEGER;
+        let shortestHops = Node.UNREACHABLE;
 
         for (let i = 0; i < this._neighbours.length; i++) {
             const neighbour = this._neighbours[i];
@@ -40,15 +40,12 @@ class Node {
             if (hopsFromNeighbour !== Node.UNREACHABLE) {
                 const route = 1 + hopsFromNeighbour;
 
-                if (route < shortestHops) {
+                if (shortestHops === Node.UNREACHABLE || route < shortestHops) {
                     shortestHops = route;
                 }
             }
         }
 
-        if (shortestHops === Number.MAX_SAFE_INTEGER) {
-            return Node.UNREACHABLE;
-        }
         return shortestHops;
     }
 
