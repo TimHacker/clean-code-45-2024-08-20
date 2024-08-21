@@ -110,17 +110,6 @@ describe ('Nodes....', () => {
         expect(b.countHopsTo(f)).toBe(1);
     });
 
-    test('Count hops with multiple routes takes first route', () => {
-        const c = new Node();
-        const d = new Node();
-        const e = new Node();
-        c.linkTo(d);
-        d.linkTo(e);
-        c.linkTo(e);
-
-        expect(c.countHopsTo(e)).toBe(2);
-    });
-
     test('Full problem', () => {
         const a = new Node();
         const b = new Node();
@@ -138,8 +127,8 @@ describe ('Nodes....', () => {
         e.linkTo(b);
         c.linkTo(e);
 
-        expect(c.countHopsTo(e)).toBe(2);
-        expect(b.countHopsTo(e)).toBe(3);
+        expect(c.countHopsTo(e)).toBe(1);
+        expect(b.countHopsTo(e)).toBe(2);
         expect(c.countHopsTo(b)).toBe(3);
         expect(d.countHopsTo(a)).toBe(3);
     });
@@ -152,6 +141,6 @@ describe ('Nodes....', () => {
         d.linkTo(e);
         c.linkTo(e);
 
-        expect(c.countMinimumHopsTo(e)).toBe(1);
+        expect(c.countHopsTo(e)).toBe(1);
     });
 })
